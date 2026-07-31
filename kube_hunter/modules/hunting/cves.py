@@ -265,4 +265,3 @@ class KubectlCVEHunter(Hunter):
         for vulnerability, fix_versions in cve_mapping.items():
             if CveUtils.is_vulnerable(fix_versions, self.event.version, not config.include_patched_versions):
                 self.publish_event(vulnerability(binary_version=self.event.version))
-
