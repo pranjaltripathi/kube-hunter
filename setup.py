@@ -58,6 +58,6 @@ class PyInstallerCommand(Command):
 
 
 setup(
-    use_scm_version={"fallback_version": "noversion"},
+    use_scm_version={"fallback_version": "0.0.0"},
     cmdclass={"dependencies": ListDependenciesCommand, "pyinstaller": PyInstallerCommand},
 )
