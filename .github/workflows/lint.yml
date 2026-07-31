@@ -17,4 +17,4 @@ jobs:
       - uses: pre-commit/action@v3.0.1
 
       - uses: ibiqlik/action-yamllint@v3
-      
+`
