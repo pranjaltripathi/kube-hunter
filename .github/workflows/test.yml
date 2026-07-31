@@ -40,9 +40,11 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          pip install -U pip
+          python -m pip install -U pip
+          python -m pip install "setuptools<81" wheel
           make dev-deps
           make install
+          
 
       - name: Test
         shell: bash
