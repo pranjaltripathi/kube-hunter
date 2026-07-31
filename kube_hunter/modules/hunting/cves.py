@@ -1,3 +1,9 @@
+import logging
+from packaging import version
+
+from kube_hunter.conf import get_config
+from kube_hunter.core.events.event_handler import handler
+
 class CveUtils:
     @staticmethod
     def get_legacy_version_cls():
@@ -33,8 +39,6 @@ class CveUtils:
     @staticmethod
     def version_compare(v1, v2):
         """Function compares two versions, handling differences with conversion to LegacyVersion"""
-        # getting raw version, while striping 'v' char at the start. if exists.
-        # removing this char lets us safely compare the two version.
         v1_raw = CveUtils.to_raw_version(v1).strip("v")
         v2_raw = CveUtils.to_raw_version(v2).strip("v")
 
@@ -67,26 +71,20 @@ class CveUtils:
         check_v = version.parse(check_version)
         base_check_v = CveUtils.get_base_release(check_v)
 
-        # default to classic compare, unless the check_version is legacy.
         version_compare_func = CveUtils.basic_compare
         if CveUtils.is_legacy_version(check_v):
             version_compare_func = CveUtils.version_compare
 
         if check_version not in fix_versions:
-            # comparing ease base release for a fix
             for fix_v in fix_versions:
                 fix_v = version.parse(fix_v)
                 base_fix_v = CveUtils.get_base_release(fix_v)
 
-                # if the check version and the current fix has the same base release
                 if base_check_v == base_fix_v:
-                    # when check_version is legacy, we use a custom compare func, to handle differences between versions
                     if version_compare_func(check_v, fix_v) == -1:
-                        # determine vulnerable if smaller and with same base version
                         vulnerable = True
                         break
 
-        # if we did't find a fix in the fix releases, checking if the version is smaller that the first fix
         if not vulnerable and version_compare_func(check_v, version.parse(fix_versions[0])) == -1:
             vulnerable = True
 
