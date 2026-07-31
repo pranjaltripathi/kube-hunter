@@ -108,7 +108,6 @@ class ListClusterRoles(ApiInfoDisclosure):
 
 
 class CreateANamespace(Vulnerability, Event):
-
     """Creating a namespace might give an attacker an area with default (exploitable) permissions to run pods in."""
 
     def __init__(self, evidence):
@@ -122,7 +121,6 @@ class CreateANamespace(Vulnerability, Event):
 
 
 class DeleteANamespace(Vulnerability, Event):
-
     """Deleting a namespace might give an attacker the option to affect application behavior"""
 
     def __init__(self, evidence):
