@@ -91,4 +91,4 @@ class CveUtils:
             vulnerable = True
 
         return vulnerable
-    
+
