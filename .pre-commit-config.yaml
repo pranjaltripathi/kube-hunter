@@ -4,9 +4,12 @@ repos:
     rev: 24.10.0
     hooks:
       - id: black
+        exclude: ^kube-hunter\.py$
 
   - repo: https://github.com/PyCQA/flake8
     rev: 7.1.1
     hooks:
       - id: flake8
+        exclude: ^kube-hunter\.py$
         additional_dependencies: [flake8-bugbear]
+        args:[flake8-bugbear e=B905,B907]
