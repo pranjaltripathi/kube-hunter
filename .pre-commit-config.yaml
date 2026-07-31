@@ -13,4 +13,3 @@ repos:
         exclude: ^kube-hunter\.py$
         additional_dependencies: [flake8-bugbear]
         args: ["--extend-ignore=B905,B907"]
-        
