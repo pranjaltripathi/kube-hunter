@@ -129,7 +129,7 @@ class CveUtils:
     @staticmethod
     def get_base_release(full_ver):
         # if LegacyVersion, converting manually to a base version
-        #if isinstance(full_ver, version.LegacyVersion):
+        # if isinstance(full_ver, version.LegacyVersion):
         if hasattr(version, "LegacyVersion") and isinstance(full_ver, version.LegacyVersion):
             return version.parse(".".join(full_ver._version.split(".")[:2]))
         return version.parse(".".join(map(str, full_ver._version.release[:2])))
