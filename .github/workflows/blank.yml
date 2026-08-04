@@ -29,8 +29,8 @@ jobs:
       - name: Validate Cortex secrets
         shell: bash
         env:
-          CORTEX_API_KEY: ${{ zfIFNPU27tHtTKuxmBXwxKptknQrF9rDDeCGc90AH5VzFip6PdfkhRbi69p65qD3OeZoUq0qG3uEaBeCuxAfZl4LpNCD0rBIWRH59KmvQyTMEct6UTljsSCdI3UsG0eY }}
-          CORTEX_API_KEY_ID: ${{ 86 }}
+          CORTEX_API_KEY: ${{ secrets.CORTEX_API_KEY }}
+          CORTEX_API_KEY_ID: ${{ secrets.CORTEX_API_KEY_ID }}
         run: |
           if [ -z "$CORTEX_API_KEY" ]; then
             echo "CORTEX_API_KEY secret is missing"
@@ -81,4 +81,4 @@ jobs:
             --repo-id "${{ github.repository }}" \
             --branch "${{ github.ref_name }}" \
             --source "GITHUB_ACTIONS" \
-            --create-repo-if-missing
+            --create-repo-if-missing            
