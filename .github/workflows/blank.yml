@@ -50,15 +50,25 @@ jobs:
           CORTEX_API_KEY: ${{ secrets.CORTEX_API_KEY }}
           CORTEX_API_KEY_ID: ${{ secrets.CORTEX_API_KEY_ID }}
         run: |
-          crtx_resp=$(curl -fsS "${CORTEX_API_URL}/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" \
+          api_endpoint="${CORTEX_API_URL}/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64"
+
+          http_code=$(curl -sS -o cortex-response.json -w "%{http_code}" "$api_endpoint" \
             -H "x-xdr-auth-id: ${CORTEX_API_KEY_ID}" \
             -H "Authorization: ${CORTEX_API_KEY}")
 
-          crtx_url=$(echo "$crtx_resp" | jq -r ".signed_url")
+          echo "Cortex download-link HTTP status: $http_code"
+
+          if [ "$http_code" != "200" ]; then
+            echo "Cortex API request failed. Response:"
+            cat cortex-response.json
+            exit 1
+          fi
+
+          crtx_url=$(jq -r ".signed_url" cortex-response.json)
 
           if [ -z "$crtx_url" ] || [ "$crtx_url" = "null" ]; then
             echo "Failed to get cortexcli download URL"
-            echo "$crtx_resp"
+            cat cortex-response.json
             exit 1
           fi
 
@@ -81,4 +91,5 @@ jobs:
             --repo-id "${{ github.repository }}" \
             --branch "${{ github.ref_name }}" \
             --source "GITHUB_ACTIONS" \
-            --create-repo-if-missing            
+            --create-repo-if-missing
+
