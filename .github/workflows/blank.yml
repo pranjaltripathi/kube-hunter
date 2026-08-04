@@ -8,8 +8,6 @@ on:
   workflow_dispatch:
 
 env:
-  CORTEX_API_KEY: ${{ secrets.CORTEX_API_KEY }}
-  CORTEX_API_KEY_ID: ${{ secrets.CORTEX_API_KEY_ID }}
   CORTEX_API_URL: https://api-unifiedcloudsecops.xdr.us.paloaltonetworks.com
 
 jobs:
@@ -28,20 +26,51 @@ jobs:
       - name: Verify Node.js Version
         run: node -v
 
+      - name: Validate Cortex secrets
+        shell: bash
+        env:
+          CORTEX_API_KEY: ${{ secrets.CORTEX_API_KEY }}
+          CORTEX_API_KEY_ID: ${{ secrets.CORTEX_API_KEY_ID }}
+        run: |
+          if [ -z "$CORTEX_API_KEY" ]; then
+            echo "CORTEX_API_KEY secret is missing"
+            exit 1
+          fi
+
+          if [ -z "$CORTEX_API_KEY_ID" ]; then
+            echo "CORTEX_API_KEY_ID secret is missing"
+            exit 1
+          fi
+
+          echo "Cortex secrets are configured"
+
       - name: Download cortexcli
         shell: bash
+        env:
+          CORTEX_API_KEY: ${{ secrets.CORTEX_API_KEY }}
+          CORTEX_API_KEY_ID: ${{ secrets.CORTEX_API_KEY_ID }}
         run: |
-          set -x
-          crtx_resp=$(curl "${CORTEX_API_URL}/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" \
+          crtx_resp=$(curl -fsS "${CORTEX_API_URL}/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" \
             -H "x-xdr-auth-id: ${CORTEX_API_KEY_ID}" \
             -H "Authorization: ${CORTEX_API_KEY}")
+
           crtx_url=$(echo "$crtx_resp" | jq -r ".signed_url")
-          curl -o cortexcli "$crtx_url"
+
+          if [ -z "$crtx_url" ] || [ "$crtx_url" = "null" ]; then
+            echo "Failed to get cortexcli download URL"
+            echo "$crtx_resp"
+            exit 1
+          fi
+
+          curl -fsSLo cortexcli "$crtx_url"
           chmod +x cortexcli
           ./cortexcli --version
 
       - name: Run Cortex CLI Code Scan
         shell: bash
+        env:
+          CORTEX_API_KEY: ${{ secrets.CORTEX_API_KEY }}
+          CORTEX_API_KEY_ID: ${{ secrets.CORTEX_API_KEY_ID }}
         run: |
           ./cortexcli \
             --api-base-url "${CORTEX_API_URL}" \
